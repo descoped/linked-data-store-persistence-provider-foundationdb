@@ -1,4 +1,4 @@
-package no.ssb.lds.core.persistence.foundationdb;
+package io.descoped.lds.core.persistence.foundationdb;
 
 import com.apple.foundationdb.KeySelector;
 import com.apple.foundationdb.KeyValue;
@@ -7,17 +7,17 @@ import com.apple.foundationdb.StreamingMode;
 import com.apple.foundationdb.async.AsyncIterable;
 import com.apple.foundationdb.subspace.Subspace;
 import com.apple.foundationdb.tuple.Tuple;
+import io.descoped.lds.api.persistence.PersistenceDeletePolicy;
+import io.descoped.lds.api.persistence.PersistenceException;
+import io.descoped.lds.api.persistence.Transaction;
+import io.descoped.lds.api.persistence.TransactionFactory;
+import io.descoped.lds.api.persistence.reactivex.RxPersistence;
+import io.descoped.lds.api.persistence.streaming.Fragment;
+import io.descoped.lds.api.persistence.streaming.FragmentType;
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
-import no.ssb.lds.api.persistence.PersistenceDeletePolicy;
-import no.ssb.lds.api.persistence.PersistenceException;
-import no.ssb.lds.api.persistence.Transaction;
-import no.ssb.lds.api.persistence.TransactionFactory;
-import no.ssb.lds.api.persistence.reactivex.RxPersistence;
-import no.ssb.lds.api.persistence.streaming.Fragment;
-import no.ssb.lds.api.persistence.streaming.FragmentType;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -188,7 +188,7 @@ public class FoundationDBRxPersistence implements RxPersistence {
     }
 
     @Override
-    public Flowable<Fragment> readVersions(Transaction tx, String namespace, String entity, String id, no.ssb.lds.api.persistence.reactivex.Range<ZonedDateTime> range) {
+    public Flowable<Fragment> readVersions(Transaction tx, String namespace, String entity, String id, io.descoped.lds.api.persistence.reactivex.Range<ZonedDateTime> range) {
         Tuple snapshotFrom = toTuple(ofNullable(range.getAfter()).orElse(BEGINNING_OF_TIME));
         Tuple snapshotTo = toTuple(ofNullable(range.getBefore()).orElse(END_OF_TIME));
         final OrderedKeyValueTransaction transaction = (OrderedKeyValueTransaction) tx;
@@ -223,18 +223,18 @@ public class FoundationDBRxPersistence implements RxPersistence {
     }
 
     @Override
-    public Flowable<Fragment> readAll(Transaction tx, ZonedDateTime snapshot, String namespace, String entity, no.ssb.lds.api.persistence.reactivex.Range<String> range) {
+    public Flowable<Fragment> readAll(Transaction tx, ZonedDateTime snapshot, String namespace, String entity, io.descoped.lds.api.persistence.reactivex.Range<String> range) {
         final OrderedKeyValueTransaction transaction = (OrderedKeyValueTransaction) tx;
         final AtomicReference<String> idRef = new AtomicReference<>();
         final AtomicReference<ZonedDateTime> versionRef = new AtomicReference<>();
         return Single.defer(() -> getPrimary(namespace, entity))
                 .flatMapPublisher(primary -> Flowable.fromPublisher(
-                        new AsyncIterablePublisher<>(transaction.getRange(
-                                KeySelector.firstGreaterOrEqual(primary.pack(Tuple.from(lexicoNext(ofNullable(range.getAfter()).orElse(" "))))),
-                                KeySelector.firstGreaterOrEqual(primary.pack(Tuple.from(lexicoPrev(ofNullable(range.getBefore()).orElse("~"))))),
-                                PRIMARY_INDEX,
-                                ROW_LIMIT_UNLIMITED
-                        )))
+                                new AsyncIterablePublisher<>(transaction.getRange(
+                                        KeySelector.firstGreaterOrEqual(primary.pack(Tuple.from(lexicoNext(ofNullable(range.getAfter()).orElse(" "))))),
+                                        KeySelector.firstGreaterOrEqual(primary.pack(Tuple.from(lexicoPrev(ofNullable(range.getBefore()).orElse("~"))))),
+                                        PRIMARY_INDEX,
+                                        ROW_LIMIT_UNLIMITED
+                                )))
                         .map(kv -> toFragment(primary, kv, namespace, entity))
                         .filter(fragment -> {
                             if (!fragment.id().equals(idRef.get())) {
@@ -254,7 +254,7 @@ public class FoundationDBRxPersistence implements RxPersistence {
 
     @Override
     public Flowable<Fragment> find(Transaction tx, ZonedDateTime snapshot, String namespace, String
-            entity, String path, byte[] value, no.ssb.lds.api.persistence.reactivex.Range<String> range) {
+            entity, String path, byte[] value, io.descoped.lds.api.persistence.reactivex.Range<String> range) {
         return Single.defer(() -> getPrimary(namespace, entity)).flatMapPublisher(primary -> {
             String arrayIndexUnawarePath = Fragment.computeIndexUnawarePath(path, new ArrayList<>());
             return getIndex(namespace, entity, arrayIndexUnawarePath).flatMapPublisher(index -> {
@@ -308,14 +308,14 @@ public class FoundationDBRxPersistence implements RxPersistence {
     @Override
     public Single<Boolean> hasPrevious(Transaction tx, ZonedDateTime snapshot, String namespace, String
             entityName, String id) {
-        return readAll(tx, snapshot, namespace, entityName, no.ssb.lds.api.persistence.reactivex.Range.lastBefore(1, id)).isEmpty()
+        return readAll(tx, snapshot, namespace, entityName, io.descoped.lds.api.persistence.reactivex.Range.lastBefore(1, id)).isEmpty()
                 .map(wasEmpty -> !wasEmpty);
     }
 
     @Override
     public Single<Boolean> hasNext(Transaction tx, ZonedDateTime snapshot, String namespace, String
             entityName, String id) {
-        return readAll(tx, snapshot, namespace, entityName, no.ssb.lds.api.persistence.reactivex.Range.firstAfter(1, id)).isEmpty()
+        return readAll(tx, snapshot, namespace, entityName, io.descoped.lds.api.persistence.reactivex.Range.firstAfter(1, id)).isEmpty()
                 .map(wasEmpty -> !wasEmpty);
     }
 

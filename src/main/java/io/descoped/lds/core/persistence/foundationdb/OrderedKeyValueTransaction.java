@@ -1,4 +1,4 @@
-package no.ssb.lds.core.persistence.foundationdb;
+package io.descoped.lds.core.persistence.foundationdb;
 
 import com.apple.foundationdb.KeySelector;
 import com.apple.foundationdb.KeyValue;
@@ -6,7 +6,7 @@ import com.apple.foundationdb.Range;
 import com.apple.foundationdb.StreamingMode;
 import com.apple.foundationdb.async.AsyncIterable;
 import com.apple.foundationdb.subspace.Subspace;
-import no.ssb.lds.api.persistence.Transaction;
+import io.descoped.lds.api.persistence.Transaction;
 
 public interface OrderedKeyValueTransaction extends Transaction {
 

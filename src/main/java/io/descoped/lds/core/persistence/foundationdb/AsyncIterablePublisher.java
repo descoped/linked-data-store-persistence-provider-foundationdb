@@ -1,4 +1,4 @@
-package no.ssb.lds.core.persistence.foundationdb;
+package io.descoped.lds.core.persistence.foundationdb;
 
 import com.apple.foundationdb.async.AsyncIterable;
 import com.apple.foundationdb.async.AsyncIterator;

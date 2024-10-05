@@ -1,6 +1,6 @@
-package no.ssb.lds.core.persistence.foundationdb;
+package io.descoped.lds.core.persistence.foundationdb;
 
-import no.ssb.lds.core.persistence.test.PersistenceIntegrationTest;
+import io.descoped.lds.core.persistence.test.PersistenceIntegrationTest;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 

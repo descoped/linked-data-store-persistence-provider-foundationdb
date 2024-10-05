@@ -1,8 +1,8 @@
-package no.ssb.lds.core.persistence.foundationdb;
+package io.descoped.lds.core.persistence.foundationdb;
 
 import com.apple.foundationdb.Database;
-import no.ssb.lds.api.persistence.Transaction;
-import no.ssb.lds.api.persistence.TransactionFactory;
+import io.descoped.lds.api.persistence.Transaction;
+import io.descoped.lds.api.persistence.TransactionFactory;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;

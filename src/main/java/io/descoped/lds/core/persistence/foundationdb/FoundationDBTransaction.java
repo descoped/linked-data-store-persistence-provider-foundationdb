@@ -1,7 +1,7 @@
-package no.ssb.lds.core.persistence.foundationdb;
+package io.descoped.lds.core.persistence.foundationdb;
 
 import com.apple.foundationdb.Range;
-import no.ssb.lds.api.persistence.TransactionStatistics;
+import io.descoped.lds.api.persistence.TransactionStatistics;
 
 import java.util.concurrent.CompletableFuture;
 
